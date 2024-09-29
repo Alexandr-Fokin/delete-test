@@ -252,27 +252,30 @@
                             ctx.putImageData(trimmedData, 0, 0);
 
 
-                            // Создание элемента с информацией о разрешении
-                            const resolutionText = document.createElement('p');
-                            resolutionText.innerText = `${trimmedWidth}x${trimmedHeight} px`;
-                            resolutionText.style.margin = '10px 0';
-                            resolutionText.style.fontSize = '14px';
-                            canvasWrapper.appendChild(resolutionText);
-
                             // Получение данных изображения в формате Base64
                             let dataUrl = canvas.toDataURL('image/jpeg', 0.92);
                             let base64Length = dataUrl.split(',')[1].length * (3 / 4);
 
-                            // Уменьшение качества, если изображение больше 500 КБ
+                            // Уменьшение качества и разрешения, если изображение больше 500 КБ
                             let quality = 0.92;
+                            let scaleFactor = 0.9;
+
                             while (base64Length / 1024 > 500 && quality > 0.1) {
-                                quality -= 0.05; // Понижение качества
+                                if (base64Length / 1024 > 500) {
+                                    // Уменьшение разрешения изображения
+                                    canvas.width = Math.floor(canvas.width * scaleFactor);
+                                    canvas.height = Math.floor(canvas.height * scaleFactor);
+                                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                                }
+
+                                // Уменьшение качества изображения
+                                quality -= 0.05;
                                 dataUrl = canvas.toDataURL('image/jpeg', quality);
                                 base64Length = dataUrl.split(',')[1].length * (3 / 4);
                             }
 
                             // Добавление пометки "сжато", если уменьшение имело место
-                            let compressed = base64Length / 1024 > 450;
+                            let compressed = base64Length / 1024 < 450;
                             if (compressed) {
                                 const compressedNote = document.createElement('p');
                                 compressedNote.innerText = "Сжато";
@@ -294,6 +297,13 @@
                             sizeText.style.margin = '5px 0';
                             sizeText.style.fontSize = '14px';
                             canvasWrapper.appendChild(sizeText);
+
+                            // Создание элемента с информацией о разрешении изображения
+                            const resolutionText = document.createElement('p');
+                            resolutionText.innerText = `Разрешение изображения: ${canvas.width}x${canvas.height} пикселей`;
+                            resolutionText.style.margin = '5px 0';
+                            resolutionText.style.fontSize = '14px';
+                            canvasWrapper.appendChild(resolutionText);
 
                             // Создание кнопки для скачивания сжатого изображения
                             const downloadButton = document.createElement('button');
