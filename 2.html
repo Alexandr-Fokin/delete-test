@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Обрезка белых полей и прозрачных областей</title>
+
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .drop-zone {
+            width: 100%;
+            max-width: 800px;
+            height: 200px;
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .canvas-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .canvas-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+
+        canvas {
+            border: 1px solid rgb(37 37 37 / 25%);
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .download-button {
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .download-button:hover {
+            background-color: #45a049;
+        }
+
+        #canvasContainer {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        #clearButton {
+            padding: 10px 20px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        #clearButton:hover {
+            background-color: #e53935;
+        }
+
+
+
+        body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    .canvas-container {
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .canvas-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 10px;
+        background-color: #f9f9f9;
+    }
+
+    canvas {
+        border: 1px solid rgb(37 37 37 / 25%);
+        border-radius: 10px;
+        margin-bottom: 10px;
+    }
+
+    .download-button {
+        padding: 5px 10px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .download-button:hover {
+        background-color: #45a049;
+    }
+
+    .canvas-wrapper>canvas {
+        text-align: center;
+        height: 75px;
+        width: 150px;
+        object-fit: contain;
+        border: 1px solid rgb(37 37 37 / 25%);
+        border-radius: 10px;
+    }
+
+    #canvasContainer {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        gap: 15px;
+        margin-top: 25px;
+    }
+    </style>
+</head>
+
+<body>
+    <h1>Загрузка и обрезка изображений</h1>
+
+
+    <div class="drop-zone" id="dropZone">Перетащите файлы сюда или нажмите для выбора</div>
+    <input type="file" id="upload" accept="image/*" multiple style="display: none;">
+    <button id="clearButton">Очистить</button>
+    <div id="canvasContainer" class="canvas-container"></div>
+
+
+    <div class="copywright"
+        style="max-width: 75%; margin: 0 auto; text-align: center; margin-top: 15px; margin-bottom: 15px; font-size: 12px; font-weight: 400;">
+        Все права на эту разработку принадлежат Фокину Александру Сергеевичу. Данное программное обеспечение (или
+        веб-сайт, приложение и т.д.) является объектом авторского права и других прав интеллектуальной собственности.
+
+        Запрещается:
+
+        Использование данного программного обеспечения (или его частей) в коммерческих целях без предварительного
+        письменного согласия правообладателя.
+        Копирование, распространение, изменение или создание производных продуктов на основе данного программного
+        обеспечения без разрешения.
+        Любое другое использование, нарушающее авторские права и права на интеллектуальную собственность.
+
+        Все товарные знаки, логотипы и фирменные наименования являются собственностью их владельцев. Использование
+        данных знаков без соответствующего разрешения также запрещено.
+        Контактная информация
+
+        Для получения разрешений на использование или по вопросам, связанным с правами собственности, пожалуйста,
+        свяжитесь с нами по адресу: fokin.alek@mail.ru</div>
+    <script>
+        const uploadInput = document.getElementById('upload');
+        const dropZone = document.getElementById('dropZone');
+        const canvasContainer = document.getElementById('canvasContainer');
+        const clearButton = document.getElementById('clearButton');
+
+        dropZone.addEventListener('click', () => uploadInput.click());
+
+        uploadInput.addEventListener('change', handleImages);
+        dropZone.addEventListener('dragover', (event) => {
+            event.preventDefault();
+            dropZone.style.backgroundColor = '#eee';
+        });
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.style.backgroundColor = '#fff';
+        });
+        dropZone.addEventListener('drop', (event) => {
+            event.preventDefault();
+            dropZone.style.backgroundColor = '#fff';
+            handleFiles(event.dataTransfer.files);
+        });
+
+        clearButton.addEventListener('click', () => {
+            canvasContainer.innerHTML = '';
+        });
+
+        function handleImages(event) {
+            handleFiles(event.target.files);
+        }
+
+        function handleFiles(files) {
+            Array.from(files).forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    const img = new Image();
+                    img.onload = function () {
+                        const canvasWrapper = document.createElement('div');
+                        canvasWrapper.className = 'canvas-wrapper';
+
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        canvasWrapper.appendChild(canvas);
+
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+
+                        // Заполнение канваса белым цветом
+                        ctx.fillStyle = '#FFFFFF';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                        // Рисование загруженного изображения поверх белого фона
+                        ctx.drawImage(img, 0, 0);
+
+                        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                        const data = imageData.data;
+
+                        let top = null, bottom = null, left = null, right = null;
+
+                        for (let y = 0; y < canvas.height; y++) {
+                            for (let x = 0; x < canvas.width; x++) {
+                                const idx = (y * canvas.width + x) * 4;
+                                if (!isWhiteOrTransparent(data, idx)) {
+                                    if (top === null) top = y;
+                                    if (bottom === null || y > bottom) bottom = y;
+                                    if (left === null || x < left) left = x;
+                                    if (right === null || x > right) right = x;
+                                }
+                            }
+                        }
+
+                        if (top !== null && bottom !== null && left !== null && right !== null) {
+                            const trimmedWidth = right - left + 1;
+                            const trimmedHeight = bottom - top + 1;
+                            const trimmedData = ctx.getImageData(left, top, trimmedWidth, trimmedHeight);
+
+                            canvas.width = trimmedWidth;
+                            canvas.height = trimmedHeight;
+                            ctx.putImageData(trimmedData, 0, 0);
+
+                            const downloadButton = document.createElement('button');
+                            downloadButton.className = 'download-button';
+                            downloadButton.innerText = `Скачать обрезанное изображение ${index + 1}`;
+                            downloadButton.addEventListener('click', function () {
+                                const link = document.createElement('a');
+                                link.href = canvas.toDataURL('image/jpeg', 0.92); // Указываем формат JPEG и качество
+                                link.download = `trimmed_image_${index + 1}.jpg`;
+                                link.click();
+                            });
+
+                            canvasWrapper.appendChild(downloadButton);
+                            canvasContainer.appendChild(canvasWrapper);
+                        }
+                    }
+                    img.src = event.target.result;
+                }
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function isWhiteOrTransparent(data, idx) {
+            const r = data[idx];
+            const g = data[idx + 1];
+            const b = data[idx + 2];
+            const a = data[idx + 3];
+            return (r > 240 && g > 240 && b > 240 && a === 255) || a === 0;
+        }
+    </script>
+</body>
+
+</html>
