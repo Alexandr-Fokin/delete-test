@@ -256,6 +256,7 @@
                             let base64Length = dataUrl.split(',')[1].length * (3 / 4);
 
                             // Проверка размера изображения, и уменьшение разрешения, если оно больше 500 КБ
+                            // Уменьшение размера изображения, если оно больше 500 КБ
                             if (base64Length / 1024 > 500) {
                                 let scaleFactor = 0.9;
 
@@ -280,6 +281,36 @@
                                 compressedNote.style.margin = '5px 0';
                                 compressedNote.style.fontSize = '14px';
                                 canvasWrapper.appendChild(compressedNote);
+                            }
+
+                            // Проверка на минимальные размеры и апскейлинг
+                            if ((canvas.width < 560 && canvas.height < 560) ||
+                                (canvas.width < 1000 && canvas.height < 560) ||
+                                (canvas.height < 1000 && canvas.width < 560)) {
+
+                                let upscaleFactor = 1.1; // Фактор увеличения
+
+                                // Цикл для увеличения размера изображения до выполнения условий
+                                while ((canvas.width < 560 && canvas.height < 560) ||
+                                    (canvas.width < 1000 && canvas.height < 560) ||
+                                    (canvas.height < 1000 && canvas.width < 560)) {
+
+                                    // Увеличение ширины и высоты на 10%
+                                    canvas.width = Math.ceil(canvas.width * upscaleFactor);
+                                    canvas.height = Math.ceil(canvas.height * upscaleFactor);
+
+                                    // Очистка и перерисовка изображения с новым размером
+                                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                                }
+
+                                // Добавление пометки "апскейлено", если увеличение имело место
+                                const upscaledNote = document.createElement('p');
+                                upscaledNote.innerText = "Апскейлено";
+                                upscaledNote.style.color = 'blue';
+                                upscaledNote.style.margin = '5px 0';
+                                upscaledNote.style.fontSize = '14px';
+                                canvasWrapper.appendChild(upscaledNote);
                             }
 
                             // Расчёт размера в килобайтах и мегабайтах
@@ -308,7 +339,7 @@
                             downloadButton.innerText = `Скачать обрезанное изображение ${imageIndex + 1}`;
                             downloadButton.addEventListener('click', function () {
                                 const link = document.createElement('a');
-                                link.href = dataUrl; // Использование финального изображения
+                                link.href = canvas.toDataURL('image/jpeg', 0.92); // Использование финального изображения
                                 link.download = file.name.replace(/\.[^/.]+$/, "") + "_trimmed.jpg";
                                 link.click();
                             });
