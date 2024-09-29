@@ -258,7 +258,7 @@
                             resolutionText.style.margin = '10px 0';
                             resolutionText.style.fontSize = '14px';
                             canvasWrapper.appendChild(resolutionText);
-                            
+
 
                             const downloadButton = document.createElement('button');
                             downloadButton.className = 'download-button';
@@ -271,6 +271,26 @@
                             });
 
                             canvasWrapper.appendChild(downloadButton);
+
+                            // Получение данных изображения в формате Base64
+                            const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+                            const base64Length = dataUrl.split(',')[1].length * (3 / 4); // Длина Base64 данных
+
+                            // Расчёт размера в килобайтах и мегабайтах
+                            const sizeInKB = (base64Length / 1024).toFixed(2);
+                            const sizeInMB = (base64Length / (1024 * 1024)).toFixed(2);
+
+                            // Создание элемента с информацией о размере файла
+                            const sizeText = document.createElement('p');
+                            sizeText.innerText = sizeInMB > 1
+                                ? `Размер файла: ${sizeInMB} МБ`
+                                : `Размер файла: ${sizeInKB} кБ`;
+                            sizeText.style.margin = '5px 0';
+                            sizeText.style.fontSize = '14px';
+                            canvasWrapper.appendChild(sizeText);
+
+
+
                             canvasContainer.appendChild(canvasWrapper);
                             imageIndex++; // Увеличение индекса изображений после добавления каждого изображения
                             toggleDownloadAllButton();
