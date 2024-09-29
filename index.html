@@ -255,26 +255,25 @@
                             let dataUrl = canvas.toDataURL('image/jpeg', 0.92);
                             let base64Length = dataUrl.split(',')[1].length * (3 / 4);
 
-                            // Уменьшение разрешения изображения, если его размер больше 500 КБ
-                            let scaleFactor = 0.9;
+                            // Проверка размера изображения, и уменьшение разрешения, если оно больше 500 КБ
+                            if (base64Length / 1024 > 500) {
+                                let scaleFactor = 0.9;
 
-                            while (base64Length / 1024 > 500) {
-                                // Уменьшение разрешения изображения на 10%
-                                canvas.width = Math.floor(canvas.width * scaleFactor);
-                                canvas.height = Math.floor(canvas.height * scaleFactor);
+                                while (base64Length / 1024 > 450) {
+                                    // Уменьшение разрешения изображения на 10%
+                                    canvas.width = Math.floor(canvas.width * scaleFactor);
+                                    canvas.height = Math.floor(canvas.height * scaleFactor);
 
-                                // Очистка и перерисовка изображения с новым размером
-                                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                                    // Очистка и перерисовка изображения с новым размером
+                                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-                                // Обновление данных изображения
-                                dataUrl = canvas.toDataURL('image/jpeg', 0.92);
-                                base64Length = dataUrl.split(',')[1].length * (3 / 4);
-                            }
+                                    // Обновление данных изображения
+                                    dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+                                    base64Length = dataUrl.split(',')[1].length * (3 / 4);
+                                }
 
-                            // Добавление пометки "сжато", если уменьшение имело место
-                            let compressed = base64Length / 1024 < 500;
-                            if (compressed) {
+                                // Добавление пометки "сжато", если уменьшение имело место
                                 const compressedNote = document.createElement('p');
                                 compressedNote.innerText = "Сжато";
                                 compressedNote.style.color = 'red';
@@ -303,13 +302,13 @@
                             resolutionText.style.fontSize = '14px';
                             canvasWrapper.appendChild(resolutionText);
 
-                            // Создание кнопки для скачивания сжатого изображения
+                            // Создание кнопки для скачивания изображения
                             const downloadButton = document.createElement('button');
                             downloadButton.className = 'download-button';
                             downloadButton.innerText = `Скачать обрезанное изображение ${imageIndex + 1}`;
                             downloadButton.addEventListener('click', function () {
                                 const link = document.createElement('a');
-                                link.href = dataUrl; // Использование сжатого изображения
+                                link.href = dataUrl; // Использование финального изображения
                                 link.download = file.name.replace(/\.[^/.]+$/, "") + "_trimmed.jpg";
                                 link.click();
                             });
@@ -318,6 +317,7 @@
                             canvasContainer.appendChild(canvasWrapper);
                             imageIndex++;
                             toggleDownloadAllButton();
+
 
                         }
                     }
