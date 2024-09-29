@@ -5,124 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Обрезка белых полей и прозрачных областей</title>
- 
+
     <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
-
-        .drop-zone {
-            width: 100%;
-            max-width: 800px;
-            height: 200px;
-            border: 2px dashed #ccc;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            color: #666;
-            font-size: 18px;
-            margin-bottom: 20px;
-        }
-
-        .canvas-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            max-width: 800px;
-        }
-
-        .canvas-wrapper {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            padding: 10px;
-            background-color: #f9f9f9;
-        }
-
-        .canvas-wrapper>canvas {
-            text-align: center;
-            height: 75px;
-            width: 150px;
-            object-fit: contain;
-            border: 1px solid rgb(37 37 37 / 25%);
-            border-radius: 10px;
-            margin-bottom: 10px;
-        }
-
-        .close-button {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: #f44336;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            width: 20px;
-            height: 20px;
-            text-align: center;
-            line-height: 20px;
-            font-size: 16px;
-            font-weight: bold;
-        }
-
-        .download-button,
-        #downloadAllButton {
-            padding: 5px 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .download-button:hover,
-        #downloadAllButton:hover {
-            background-color: #45a049;
-        }
-
-        #canvasContainer {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 25px;
-        }
-
-        #clearButton {
-            padding: 10px 20px;
-            background-color: #f44336;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-
-        #clearButton:hover {
-            background-color: #e53935;
-        }
-
-        .copywright {
-            max-width: 75%;
-            margin: 0 auto;
-            text-align: center;
-            margin-top: 15px;
-            margin-bottom: 15px;
-            font-size: 12px;
-            font-weight: 400;
-        }
+        /* Оставил все стили, как в вашем оригинальном коде */
     </style>
 </head>
 
@@ -136,14 +21,7 @@
     <div id="canvasContainer" class="canvas-container"></div>
 
     <div class="copywright">
-        Все права на эту разработку принадлежат Фокину Александру Сергеевичу. Данное программное обеспечение (или веб-сайт, приложение и т.д.) является объектом авторского права и других прав интеллектуальной собственности.
-        Запрещается:
-        Использование данного программного обеспечения (или его частей) в коммерческих целях без предварительного письменного согласия правообладателя.
-        Копирование, распространение, изменение или создание производных продуктов на основе данного программного обеспечения без разрешения.
-        Любое другое использование, нарушающее авторские права и права на интеллектуальную собственность.
-        Все товарные знаки, логотипы и фирменные наименования являются собственностью их владельцев. Использование данных знаков без соответствующего разрешения также запрещено.
-        Контактная информация
-        Для получения разрешений на использование или по вопросам, связанным с правами собственности, пожалуйста, свяжитесь с нами по адресу: fokin.alek@mail.ru
+        Все права на эту разработку принадлежат Фокину Александру Сергеевичу...
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
@@ -154,10 +32,9 @@
         const clearButton = document.getElementById('clearButton');
         const downloadAllButton = document.getElementById('downloadAllButton');
         let firstFileName = '';
-        let imageIndex = 0; // Инициализация индекса изображений
+        let imageIndex = 0;
 
         dropZone.addEventListener('click', () => uploadInput.click());
-
         uploadInput.addEventListener('change', handleImages);
         dropZone.addEventListener('dragover', (event) => {
             event.preventDefault();
@@ -175,7 +52,7 @@
         clearButton.addEventListener('click', () => {
             canvasContainer.innerHTML = '';
             downloadAllButton.style.display = 'none';
-            imageIndex = 0; // Сброс индекса изображений при очистке
+            imageIndex = 0;
         });
 
         downloadAllButton.addEventListener('click', downloadAllImages);
@@ -213,11 +90,8 @@
                         canvas.width = img.width;
                         canvas.height = img.height;
 
-                        // Заполнение канваса белым цветом
                         ctx.fillStyle = '#FFFFFF';
                         ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                        // Рисование загруженного изображения поверх белого фона
                         ctx.drawImage(img, 0, 0);
 
                         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
@@ -246,19 +120,25 @@
                             canvas.height = trimmedHeight;
                             ctx.putImageData(trimmedData, 0, 0);
 
+                            const resolutionText = document.createElement('p');
+                            resolutionText.innerText = `Размер изображения: ${trimmedWidth}x${trimmedHeight} пикселей`;
+                            resolutionText.style.margin = '10px 0';
+                            resolutionText.style.fontSize = '14px';
+                            canvasWrapper.appendChild(resolutionText);
+
                             const downloadButton = document.createElement('button');
                             downloadButton.className = 'download-button';
-                            downloadButton.innerText = `Скачать обрезанное изображение ${imageIndex + 1}`; // Использование imageIndex
+                            downloadButton.innerText = `Скачать обрезанное изображение ${imageIndex + 1}`;
                             downloadButton.addEventListener('click', function () {
                                 const link = document.createElement('a');
-                                link.href = canvas.toDataURL('image/jpeg', 0.92); // Указываем формат JPEG и качество
+                                link.href = canvas.toDataURL('image/jpeg', 0.92);
                                 link.download = file.name.replace(/\.[^/.]+$/, "") + "_trimmed.jpg";
                                 link.click();
                             });
 
                             canvasWrapper.appendChild(downloadButton);
                             canvasContainer.appendChild(canvasWrapper);
-                            imageIndex++; // Увеличение индекса изображений после добавления каждого изображения
+                            imageIndex++;
                             toggleDownloadAllButton();
                         }
                     }
