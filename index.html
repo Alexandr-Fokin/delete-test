@@ -252,22 +252,6 @@
                             ctx.putImageData(trimmedData, 0, 0);
 
 
-
-
-
-                            const downloadButton = document.createElement('button');
-                            downloadButton.className = 'download-button';
-                            downloadButton.innerText = `Скачать обрезанное изображение ${imageIndex + 1}`; // Использование imageIndex
-                            downloadButton.addEventListener('click', function () {
-                                const link = document.createElement('a');
-                                link.href = canvas.toDataURL('image/jpeg', 0.92); // Указываем формат JPEG и качество
-                                link.download = file.name.replace(/\.[^/.]+$/, "") + "_trimmed.jpg";
-                                link.click();
-                            });
-
-                            canvasWrapper.appendChild(downloadButton);
-
-
                             // Создание элемента с информацией о разрешении
                             const resolutionText = document.createElement('p');
                             resolutionText.innerText = `${trimmedWidth}x${trimmedHeight} px`;
@@ -311,9 +295,20 @@
                             sizeText.style.fontSize = '14px';
                             canvasWrapper.appendChild(sizeText);
 
+                            // Создание кнопки для скачивания сжатого изображения
+                            const downloadButton = document.createElement('button');
+                            downloadButton.className = 'download-button';
+                            downloadButton.innerText = `Скачать обрезанное изображение ${imageIndex + 1}`;
+                            downloadButton.addEventListener('click', function () {
+                                const link = document.createElement('a');
+                                link.href = dataUrl; // Использование сжатого изображения
+                                link.download = file.name.replace(/\.[^/.]+$/, "") + "_trimmed.jpg";
+                                link.click();
+                            });
 
+                            canvasWrapper.appendChild(downloadButton);
                             canvasContainer.appendChild(canvasWrapper);
-                            imageIndex++; // Увеличение индекса изображений после добавления каждого изображения
+                            imageIndex++;
                             toggleDownloadAllButton();
                         }
                     }
