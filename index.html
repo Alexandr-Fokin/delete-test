@@ -267,6 +267,7 @@
 
                             canvasWrapper.appendChild(downloadButton);
 
+
                             // Создание элемента с информацией о разрешении
                             const resolutionText = document.createElement('p');
                             resolutionText.innerText = `${trimmedWidth}x${trimmedHeight} px`;
@@ -275,8 +276,27 @@
                             canvasWrapper.appendChild(resolutionText);
 
                             // Получение данных изображения в формате Base64
-                            const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
-                            const base64Length = dataUrl.split(',')[1].length * (3 / 4); // Длина Base64 данных
+                            let dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+                            let base64Length = dataUrl.split(',')[1].length * (3 / 4);
+
+                            // Уменьшение качества, если изображение больше 500 КБ
+                            let quality = 0.92;
+                            while (base64Length / 1024 > 500 && quality > 0.1) {
+                                quality -= 0.05; // Понижение качества
+                                dataUrl = canvas.toDataURL('image/jpeg', quality);
+                                base64Length = dataUrl.split(',')[1].length * (3 / 4);
+                            }
+
+                            // Добавление пометки "сжато", если уменьшение имело место
+                            let compressed = base64Length / 1024 > 450;
+                            if (compressed) {
+                                const compressedNote = document.createElement('p');
+                                compressedNote.innerText = "Сжато";
+                                compressedNote.style.color = 'red';
+                                compressedNote.style.margin = '5px 0';
+                                compressedNote.style.fontSize = '14px';
+                                canvasWrapper.appendChild(compressedNote);
+                            }
 
                             // Расчёт размера в килобайтах и мегабайтах
                             const sizeInKB = (base64Length / 1024).toFixed(2);
@@ -290,7 +310,6 @@
                             sizeText.style.margin = '5px 0';
                             sizeText.style.fontSize = '14px';
                             canvasWrapper.appendChild(sizeText);
-
 
 
                             canvasContainer.appendChild(canvasWrapper);
