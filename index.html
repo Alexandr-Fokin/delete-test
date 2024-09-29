@@ -252,12 +252,7 @@
                             ctx.putImageData(trimmedData, 0, 0);
 
 
-                            // Создание элемента с информацией о разрешении
-                            const resolutionText = document.createElement('p');
-                            resolutionText.innerText = `${trimmedWidth}x${trimmedHeight} px`;
-                            resolutionText.style.margin = '10px 0';
-                            resolutionText.style.fontSize = '14px';
-                            canvasWrapper.appendChild(resolutionText);
+
 
 
                             const downloadButton = document.createElement('button');
@@ -271,6 +266,13 @@
                             });
 
                             canvasWrapper.appendChild(downloadButton);
+
+                            // Создание элемента с информацией о разрешении
+                            const resolutionText = document.createElement('p');
+                            resolutionText.innerText = `${trimmedWidth}x${trimmedHeight} px`;
+                            resolutionText.style.margin = '10px 0';
+                            resolutionText.style.fontSize = '14px';
+                            canvasWrapper.appendChild(resolutionText);
 
                             // Получение данных изображения в формате Base64
                             const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
